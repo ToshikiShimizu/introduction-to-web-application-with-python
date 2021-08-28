@@ -6,17 +6,13 @@ from socket import socket
 from threading import Thread
 from typing import Tuple
 
+import settings
 from henango.http.request import HTTPRequest
 from henango.http.response import HTTPResponse
 from urls import URL_VIEW
 
 
-class WorkerThread(Thread):
-    # 実行ファイルのあるディレクトリ
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    # 静的配信するファイルを置くディレクトリ
-    STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
+class Worker(Thread):
     # 拡張子とMIME Typeの対応
     MIME_TYPES = {
         "html": "text/html; charset=UTF-8",
@@ -127,11 +123,13 @@ class WorkerThread(Thread):
         """
         リクエストpathから、staticファイルの内容を取得する
         """
+        default_static_root = os.path.join(os.path.dirname(__file__), "../../static")
+        static_root = getattr(settings, "STATIC_ROOT", default_static_root)
 
         # pathの先頭の/を削除し、相対パスにしておく
         relative_path = path.lstrip("/")
         # ファイルのpathを取得
-        static_file_path = os.path.join(self.STATIC_ROOT, relative_path)
+        static_file_path = os.path.join(static_root, relative_path)
 
         with open(static_file_path, "rb") as f:
             return f.read()
