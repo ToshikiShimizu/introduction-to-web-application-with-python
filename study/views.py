@@ -5,20 +5,17 @@ from pprint import pformat
 
 from henango.http.request import HTTPRequest
 from henango.http.response import HTTPResponse
+from henango.template.renderer import render
 
 
 def now(request: HTTPRequest) -> HTTPResponse:
     """
     現在時刻を表示するHTMLを生成する
     """
-    html = f"""\
-        <html>
-        <body>
-            <h1>Now: {datetime.now()}</h1>
-        </body>
-        </html>
-    """
-    body = textwrap.dedent(html).encode()
+    context = {"now": datetime.now()}
+    html = render("./templates/now.html", context)
+
+    body = html.encode()
     content_type = "text/html; charset=UTF-8"
 
     return HTTPResponse(body=body, content_type=content_type, status_code=200)
@@ -35,7 +32,7 @@ def show_request(request: HTTPRequest) -> HTTPResponse:
             <p>
                 {request.method} {request.path} {request.http_version}
             </p>
-            <h1>Headers:</h1>
+            <h1>Headers:</h1>Ò
             <pre>{pformat(request.headers)}</pre>
             <h1>Body:</h1>
             <pre>{request.body.decode("utf-8", "ignore")}</pre>
@@ -73,5 +70,22 @@ def parameters(request: HTTPRequest) -> HTTPResponse:
         body = textwrap.dedent(html).encode()
         content_type = "text/html; charset=UTF-8"
         status_code = 200
+
+    return HTTPResponse(body=body, content_type=content_type, status_code=status_code)
+
+
+def user_profile(request: HTTPRequest) -> HTTPResponse:
+    user_id = request.params["user_id"]
+    html = f"""\
+        <html>
+        <body>
+            <h1>プロフィール</h1>
+            <p>ID: {user_id}
+        </body>
+        </html>
+    """
+    body = textwrap.dedent(html).encode()
+    content_type = "text/html; charset=UTF-8"
+    status_code = 200
 
     return HTTPResponse(body=body, content_type=content_type, status_code=status_code)
