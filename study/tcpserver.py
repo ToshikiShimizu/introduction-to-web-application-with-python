@@ -17,7 +17,8 @@ class TCPServer:
             # wait for a connection from the outside and estabish a connection if there is a connection
             print("Wait for a connection")
             (client_socket, address) = server_socket.accept()
-            print("The connection with the client is complete. remote_address: {}".format(address))
+            print("The connection with the client is complete. remote_address: {}".format(
+                address))
 
             # get the data sent from the client
             request = client_socket.recv(4096)

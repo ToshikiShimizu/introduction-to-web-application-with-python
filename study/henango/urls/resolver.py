@@ -4,6 +4,7 @@ from henango.http.request import HTTPRequest
 from henango.http.response import HTTPResponse
 from henango.views.static import static
 from urls import url_patterns
+from static_url_map import static_url_map
 
 
 class URLResolver:
@@ -18,5 +19,9 @@ class URLResolver:
             if match:
                 request.params.update(match.groupdict())
                 return url_pattern.view
+
+        # 静的コンテンツのURLマッピング
+        if request.path in static_url_map:
+            request.path = static_url_map[request.path]
 
         return static

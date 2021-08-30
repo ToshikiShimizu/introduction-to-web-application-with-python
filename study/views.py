@@ -2,7 +2,6 @@ import urllib.parse
 from datetime import datetime
 from pprint import pformat
 
-from henango.http.cookie import Cookie
 from henango.http.request import HTTPRequest
 from henango.http.response import HTTPResponse
 from henango.template.renderer import render
@@ -22,7 +21,8 @@ def show_request(request: HTTPRequest) -> HTTPResponse:
     """
     HTTPリクエストの内容を表示するHTMLを生成する
     """
-    context = {"request": request, "headers": pformat(request.headers), "body": request.body.decode("utf-8", "ignore")}
+    context = {"request": request, "headers": pformat(
+        request.headers), "body": request.body.decode("utf-8", "ignore")}
     body = render("show_request.html", context)
 
     return HTTPResponse(body=body)
@@ -55,7 +55,7 @@ def user_profile(request: HTTPRequest) -> HTTPResponse:
 
 
 def set_cookie(request: HTTPRequest) -> HTTPResponse:
-    return HTTPResponse(cookies=[Cookie(name="username", value="TARO")])
+    return HTTPResponse(cookies={"username": "TARO"})
 
 
 def login(request: HTTPRequest) -> HTTPResponse:
@@ -68,12 +68,9 @@ def login(request: HTTPRequest) -> HTTPResponse:
         username = post_params["username"][0]
         email = post_params["email"][0]
 
-        cookies = [
-            Cookie(name="username", value=username, max_age=30),
-            Cookie(name="email", value=email, max_age=30),
-        ]
-
-        return HTTPResponse(status_code=302, headers={"Location": "/welcome"}, cookies=cookies)
+        return HTTPResponse(
+            status_code=302, headers={"Location": "/welcome"}, cookies={"username": username, "email": email}
+        )
 
 
 def welcome(request: HTTPRequest) -> HTTPResponse:
@@ -84,6 +81,7 @@ def welcome(request: HTTPRequest) -> HTTPResponse:
     # Welcome画面を表示
     username = request.cookies["username"]
     email = request.cookies["email"]
-    body = render("welcome.html", context={"username": username, "email": email})
+    body = render("welcome.html", context={
+                  "username": username, "email": email})
 
     return HTTPResponse(body=body)
